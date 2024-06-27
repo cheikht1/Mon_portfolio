@@ -1,5 +1,5 @@
 provider "kubernetes" {
-  config_path = "~/.kube/config"
+  config_path = "C:/Users/bmd tech/.kube/config"
 }
 
 resource "kubernetes_manifest" "mon-portfolio-deployment" {
