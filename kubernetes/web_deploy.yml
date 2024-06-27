@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mon-portfolio
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mon-portfolio
+  template:
+    metadata:
+      labels:
+        app: mon-portfolio
+    spec:
+      containers:
+      - name: mon-portfolio
+        image: cheikht/xesh-web:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+
+# ---
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: mon-portfolio
+# spec:
+#   type: NodePort
+#   selector:
+#     app: mon-portfolio
+#   ports:
+#   - port: 80
+#     targetPort: 80
+
