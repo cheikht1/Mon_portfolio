@@ -35,6 +35,7 @@ pipeline {
                 dir('terraform') {
                     script {
                         // Lancement de Terraform
+                        bat 'terraform destroy --auto-approve'
                         bat 'terraform --version'
                         bat 'terraform init'
                         bat 'terraform plan'

@@ -1,11 +1,21 @@
-# Utilisez une image de base appropriée
-FROM nginx:alpine
+# Utiliser l'image officielle PHP avec Apache
+FROM php:7.4-apache
 
-# Copiez les fichiers du site web dans le conteneur
-COPY . /usr/share/nginx/html
+# Activer mod_status d'Apache pour exporter les métriques
+RUN a2enmod status
 
-# Exposez le port 80 pour accéder au site web
+# Configurer l'accès aux métriques (autoriser depuis tous les hôtes)
+RUN echo "ExtendedStatus On\n<Location /server-status>\n  SetHandler server-status\n  Require all granted\n</Location>" >> /etc/apache2/apache2.conf
+
+# Copier le code de l'application dans le répertoire approprié
+COPY . /var/www/html/
+
+# Configurer les permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
+# Exposer le port 80
 EXPOSE 80
 
-# Commande par défaut pour démarrer le serveur web
-CMD ["nginx", "-g", "daemon off;"]
+# Démarrer Apache
+CMD ["apache2-foreground"]
