@@ -13,6 +13,7 @@ spec:
       labels:
         app: mon-portfolio
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: mon-portfolio
         image: cheikht/xesh-web:latest
