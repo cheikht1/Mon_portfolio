@@ -2,31 +2,39 @@ pipeline {
     agent any
     environment {
         DOCKER_COMPOSE_VERSION = '1.29.2'
-        // PATH = "/usr/local/bin:$PATH" // Assurez-vous que cela inclut le chemin vers Docker
         DOCKER_IMAGE1 = "xesh-web"
         DOCKER_TAG1 = "latest"
-        // DOCKER_IMAGE2 = "xesh-mysql"
-        // DOCKER_TAG2 = "latest"
     }
     stages {
         stage('Build') {
             steps {
                 script {
-                    bat 'docker --version' // Vérifier que Docker est accessible
-                    // Lancement de Docker Compose
+                    bat 'docker --version' // Vérifie que Docker est accessible
+                    // Lancement de Docker Build
                     bat "docker build -t ${DOCKER_IMAGE1}:${DOCKER_TAG1} -f Web.Dockerfile ."
-                    // bat 'docker build -t ${DOCKER_IMAGE2}:${DOCKER_TAG2} -f Web.Dockerfile .'
                 }
             }
         }
         stage('Push Docker Image') {
             steps {
                 script {
-                    // Mettez ici vos commandes pour pousser
+                    // Pousse l'image Docker vers le registre
                     bat "docker tag ${DOCKER_IMAGE1}:${DOCKER_TAG1} cheikht/${DOCKER_IMAGE1}:${DOCKER_TAG1}"
                     bat "docker push cheikht/${DOCKER_IMAGE1}:${DOCKER_TAG1}"
-                    // bat 'docker tag ${DOCKER_IMAGE2}:${DOCKER_TAG2} cheikht/${DOCKER_IMAGE2}:${DOCKER_TAG2}'                                                                                                         NH}:${DOCKER_TAG2} ngeuya/${DOCKER_IMAGE2}:${DOCKER_TAG2}'
-                    // bat 'docker push ngeuya/${DOCKER_IMAGE2}:${DOCKER_TAG2}'
+                }
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // Lancer sonar-scanner avec les paramètres nécessaires
+                    bat '''
+                        sonar-scanner ^
+                        -Dsonar.projectKey=mon-portfolio ^
+                        -Dsonar.sources=. ^
+                        -Dsonar.host.url=http://localhost:9000 ^
+                        -Dsonar.login=sqp_fb58c49e5f4f652e4307ccf28e977a907d2f4282
+                    '''
                 }
             }
         }
@@ -40,7 +48,6 @@ pipeline {
                         bat 'terraform init'
                         bat 'terraform plan'
                         bat 'terraform apply --auto-approve'
-                        // bat 'terraform destroy --auto-approve'
                     }
                 }
             }
@@ -48,7 +55,6 @@ pipeline {
     }
     post {
         success {
-           // bat 'docker-compose down -v'
             slackSend channel: '#projetdevops', message: 'Build réussi'
         }
         failure {
